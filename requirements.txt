@@ -6,3 +6,4 @@ PyQt-Fluent-Widgets
 yt_dlp
 modelscope
 spleeter
+psutil
