@@ -15,10 +15,9 @@ def test_openai(base_url, api_key, model):
     """
     try:
         # 创建OpenAI客户端并发送请求到OpenAI API
-        
-        openai.api_key = api_key
-        openai.api_base = base_url
-        response = openai.ChatCompletion.create(
+        response = openai.OpenAI(
+            base_url=base_url, api_key=api_key, timeout=15
+        ).chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
@@ -33,45 +32,29 @@ def test_openai(base_url, api_key, model):
         return False, str(e)
 
 
-def get_openai_models(api_key, base_url=None):
-    """
-    获取并排序OpenAI模型列表。
-
-    Args:
-        api_key (str): OpenAI API密钥。
-        base_url (str, optional): OpenAI API基础URL。默认为None，使用openai库的默认设置。
-
-    Returns:
-        list: 排序后的模型ID列表。如果发生异常，返回一个空列表。
-    """
+def get_openai_models(base_url, api_key):
     try:
-        openai.api_key = api_key
-        if base_url:
-            openai.api_base = base_url
+        # 创建OpenAI客户端并获取模型列表
+        models = openai.OpenAI(
+            base_url=base_url, api_key=api_key, timeout=10
+        ).models.list()
 
-        models = openai.Model.list()
-
-        # 从配置文件或者字典中加载模型权重
-        model_weights = {
-            "gpt-4o": 10,
-            "claude-3-5": 10,
-            "gpt-4": 5,
-            "claude-3": 6,
-            "deepseek": 3,
-            "glm": 3,
-        }
-
+        # 根据不同模型设置权重进行排序
         def get_model_weight(model_name):
             model_name = model_name.lower()
-            for prefix, weight in model_weights.items():
-                if model_name.startswith(prefix):
-                    return weight
+            if model_name.startswith(("gpt-4o", "claude-3-5")):
+                return 10
+            elif model_name.startswith("gpt-4"):
+                return 5
+            elif model_name.startswith("claude-3"):
+                return 6
+            elif model_name.startswith(("deepseek", "glm")):
+                return 3
             return 0
 
         sorted_models = sorted(
             [model.id for model in models], key=lambda x: (-get_model_weight(x), x)
         )
         return sorted_models
-    except Exception as e:
-        print(f"Error getting OpenAI models: {e}")  # 打印错误日志
+    except Exception:
         return []

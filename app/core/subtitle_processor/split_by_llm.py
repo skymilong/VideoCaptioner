@@ -98,7 +98,8 @@ def split_by_llm_retry(text: str,
             return cached_result
     logger.info(f"未命中缓存，开始断句")
     # 初始化OpenAI客户端
-    response = openai.ChatCompletion.create(
+    client = openai.OpenAI()
+    response = client.chat.completions.create(
         model=model,
         messages=[
             {"role": "system", "content": system_prompt},

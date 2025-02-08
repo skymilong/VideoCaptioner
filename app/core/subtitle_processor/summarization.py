@@ -1,6 +1,6 @@
 import os
 
-import openai
+from openai import OpenAI
 
 from ..utils import json_repair
 from ..utils.logger import setup_logger
@@ -18,15 +18,13 @@ class SubtitleSummarizer:
             raise ValueError("环境变量 OPENAI_BASE_URL 和 OPENAI_API_KEY 必须设置")
 
         self.model = model
-
-        openai.api_key = self.api_key
-        openai.api_base = self.base_url
+        self.client = OpenAI(base_url=base_url, api_key=api_key)
 
     def summarize(self, subtitle_content: str) -> str:
         logger.info(f"开始摘要化字幕内容")
         try:
             subtitle_content = subtitle_content[:3000]
-            response = openai.ChatCompletion.create(
+            response = self.client.chat.completions.create(
                 model=self.model,
                 stream=False,
                 messages=[

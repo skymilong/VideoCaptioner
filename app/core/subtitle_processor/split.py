@@ -8,7 +8,7 @@ from typing import List, Optional, Union
 import json
 from concurrent.futures import as_completed
 
-import openai
+from openai import OpenAI
 
 from app.config import CACHE_PATH
 from app.core.bk_asr.asr_data import ASRData, ASRDataSeg
@@ -225,8 +225,7 @@ class SubtitleSplitter:
         if not (base_url and api_key):
             raise ValueError("环境变量 OPENAI_BASE_URL 和 OPENAI_API_KEY 必须设置")
 
-        openai.api_key = self.api_key
-        openai.api_base = self.base_url
+        self.client = OpenAI(base_url=base_url, api_key=api_key)
 
     def _init_thread_pool(self):
         """初始化线程池"""
@@ -466,7 +465,7 @@ class SubtitleSplitter:
 
         # 调用API
         logger.info(f"开始调用API进行分段，文本长度: {count_words(txt)}")
-        response = openai.ChatCompletion.create(
+        response = self.client.chat.completions.create(
             model=self.model,
             messages=[
                 {"role": "system", "content": system_prompt},

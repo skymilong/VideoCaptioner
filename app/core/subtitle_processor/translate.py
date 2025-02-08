@@ -8,7 +8,7 @@ import retry
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from abc import ABC, abstractmethod
 from enum import Enum
-import openai
+from openai import OpenAI
 import json
 from dataclasses import dataclass
 from functools import lru_cache
@@ -218,8 +218,7 @@ class OpenAITranslator(BaseTranslator):
         if not (base_url and api_key):
             raise ValueError("环境变量 OPENAI_BASE_URL 和 OPENAI_API_KEY 必须设置")
 
-        openai.api_key = self.api_key
-        openai.api_base = self.base_url
+        self.client = OpenAI(base_url=base_url, api_key=api_key)
 
     def _translate_chunk(self, subtitle_chunk: Dict[str, str]) -> Dict[str, str]:
         """翻译字幕块"""
@@ -344,7 +343,7 @@ class OpenAITranslator(BaseTranslator):
             {"role": "user", "content": user_content},
         ]
 
-        return openai.ChatCompletion.create(
+        return self.client.chat.completions.create(
             model=self.model,
             messages=messages,
             temperature=self.temperature,
