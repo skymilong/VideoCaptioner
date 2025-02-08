@@ -4,6 +4,8 @@
 
 # 开发环境
 .idea/
+.DS_Store
+.vscode/
 *.pyc
 */__pycache__/
 *.env
@@ -22,4 +24,4 @@
 /AppData/
 /output/
 /work-dir/
-.vscode/
+/pretrained_models/
