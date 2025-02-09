@@ -80,6 +80,7 @@ class LLMServiceEnum(Enum):
     SILICON_CLOUD = "SiliconCloud"
     DEEPSEEK = "DeepSeek"
     OLLAMA = "Ollama"
+    LM_STUDIO = "LM Studio"
     GEMINI = "Gemini"
     CHATGLM = "ChatGLM"
     PUBLIC = "软件公益模型"
@@ -100,8 +101,8 @@ class TranslatorServiceEnum(Enum):
 
     OPENAI = "OpenAI"
     DEEPLX = "DeepLx 翻译"
-    BING = "Bing 翻译"
-    GOOGLE = "Google 翻译"
+    BING = "微软翻译"
+    GOOGLE = "谷歌翻译"
 
 
 class VadMethodEnum(Enum):

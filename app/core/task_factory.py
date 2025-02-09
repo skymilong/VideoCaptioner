@@ -104,15 +104,18 @@ class TaskFactory:
             .stem.replace("【原始字幕】", "")
             .replace(f"【下载字幕】", "")
         )
+        # 只在需要翻译时添加翻译服务后缀
+        suffix = (
+            f"-{cfg.translator_service.value.value}" if cfg.need_translate.value else ""
+        )
+
         if need_next_task:
             output_path = str(
-                Path(file_path).parent
-                / f"【样式字幕】{output_name}-{cfg.translator_service.value.value}.ass"
+                Path(file_path).parent / f"【样式字幕】{output_name}{suffix}.ass"
             )
         else:
             output_path = str(
-                Path(file_path).parent
-                / f"【字幕】{output_name}-{cfg.translator_service.value.value}.srt"
+                Path(file_path).parent / f"【字幕】{output_name}{suffix}.srt"
             )
 
         if cfg.split_type.value == SplitTypeEnum.SENTENCE.value:
@@ -138,6 +141,10 @@ class TaskFactory:
             base_url = cfg.ollama_api_base.value
             api_key = cfg.ollama_api_key.value
             llm_model = cfg.ollama_model.value
+        elif current_service == LLMServiceEnum.LM_STUDIO:
+            base_url = cfg.lm_studio_api_base.value
+            api_key = cfg.lm_studio_api_key.value
+            llm_model = cfg.lm_studio_model.value
         elif current_service == LLMServiceEnum.GEMINI:
             base_url = cfg.gemini_api_base.value
             api_key = cfg.gemini_api_key.value
