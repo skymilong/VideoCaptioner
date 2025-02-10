@@ -27,9 +27,10 @@ from app.core.subtitle_processor.prompt import (
 )
 from app.core.storage.cache_manager import CacheManager
 from app.config import CACHE_PATH
+from app.core.utils.logger import setup_logger
 
 
-logger = logging.getLogger("subtitle_translator")
+logger = setup_logger("subtitle_translator")
 
 
 class TranslatorType(Enum):
@@ -172,7 +173,6 @@ class BaseTranslator(ABC):
         self.is_running = False
         if hasattr(self, "executor") and self.executor is not None:
             try:
-                logger.info("正在关闭线程池")
                 self.executor.shutdown(wait=False, cancel_futures=True)
             except Exception as e:
                 logger.error(f"关闭线程池时出错：{str(e)}")
@@ -253,7 +253,6 @@ class OpenAITranslator(BaseTranslator):
 
             result = {}
             if cache_result:
-                logger.info("使用缓存的翻译结果")
                 result = json.loads(cache_result)
             else:
                 # 调用API翻译
@@ -309,7 +308,6 @@ class OpenAITranslator(BaseTranslator):
 
                 if cache_result:
                     result[idx] = cache_result
-                    logger.info(f"使用缓存的单条翻译结果：{idx}")
                     continue
 
                 response = self._call_api(single_prompt, text)
